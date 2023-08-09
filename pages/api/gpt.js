@@ -25,9 +25,7 @@ export default async function handler(req, res) {
     const openaiMessages = [
       {
         role: "system",
-        content: `You are a builder bot. 
-    
-                   `,
+        content: `You are a builder bot.`,
       },
       ...conversation.map((msg) => ({
         role: msg.author,
@@ -55,35 +53,6 @@ export default async function handler(req, res) {
     const responseMessage = completion.data.choices[0].message;
 
     return res.json(responseMessage);
-
-    // Check if GPT wanted to call a function
-    if (responseMessage.function_call) {
-      const functionName = responseMessage.function_call.name;
-      const functionToCall = functionMap[functionName];
-      const functionArgs = JSON.parse(responseMessage.function_call.arguments);
-      const functionResponse = await functionToCall(functionArgs);
-
-      // Append the result of the function call to the messages list and send another completion request
-      openaiMessages.push(responseMessage);
-      openaiMessages.push({
-        role: "function",
-        name: functionName,
-        content: functionResponse,
-      });
-      const secondCompletion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo-0613",
-        messages: openaiMessages,
-      });
-
-      // Use the new completion to form the response
-      const secondResponseMessage = secondCompletion.data.choices[0].message;
-      const botReply = secondResponseMessage.content;
-
-      return res.status(200).json({ botReply: botReply });
-    }
-
-    const botReply = responseMessage.content;
-    return res.status(200).json({ botReply: botReply });
   } catch (error) {
     console.error("Error getting reply from OpenAI:", error);
     return res.status(500).json({
