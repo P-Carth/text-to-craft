@@ -1,0 +1,232 @@
+"In Minecraft-style building, cylindrical structures are typically built using a "circle algorithm" to represent the shape. Unfortunately, as the grid is discrete, the circle won't be perfect but will be an approximation of a real cylinder. Below is a 7x7 approximation of a circle, represented in 2D.
+
+Here's how you represent 2D:
+
+```
+0 0 1 1 1 0 0
+0 1 1 1 1 1 0
+1 1 1 1 1 1 1
+1 1 1 1 1 1 1
+0 1 1 1 1 1 0
+0 0 1 1 1 0 0
+0 0 0 0 0 0 0
+```
+
+The '1' represent block positions, '0' are air spaces. But we want to build it as a 5 blocks high cylinder, so it'll be more like this:
+
+**Layer 1**
+```
+0 0 1 1 1 0 0
+0 1 1 1 1 1 0
+1 1 1 1 1 1 1
+1 1 1 1 1 1 1
+0 1 1 1 1 1 0
+0 0 1 1 1 0 0
+0 0 0 0 0 0 0
+```
+
+**Layer 2 to Layer 5**
+
+```
+0 0 1 1 1 0 0
+0 1 1 1 1 1 0
+1 1 1 1 1 1 1
+1 1 1 1 1 1 1
+0 1 1 1 1 1 0
+0 0 1 1 1 0 0
+0 0 0 0 0 0 0
+```
+
+Let's build this using the build_structure function from the functions namespace.
+
+```json
+"functions.build_structure": [
+  {
+    "layer": 1,
+    "matrix": [
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]
+  },
+  {
+    "layer": 2,
+    "matrix": [
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]
+  },
+  {
+    "layer": 3,
+    "matrix": [
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]
+  },
+  {
+    "layer": 4,
+    "matrix": [
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]
+  },
+  {
+    "layer": 5,
+    "matrix": [
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0]
+    ]
+  }
+]
+```
+Please note: The '1' value denotes the wood material. If you want to use cobblestone, replace '1' with '2'."
+
+
+
+***************************************************************************************************************************************************
+
+
+
+"This is my suggested design for a 7x7x5 cylindrical building. Since this is a cylindrical building, I will use air as the main building block in the center of the design to leave a hollowed out space, and cobblestone represents the main structure of the building itself with wood used for design enhancing purposes like the base and top floor.
+
+Here is the simple interpretation of the structure:
+
+`layers[layer number][row][column]`
+
+- `0:` Represents air 
+- `1:` Represents wood
+- `2:` Represents cobblestone
+
+```
+Layer 1:
+2211122
+2100021
+2000022
+2000022
+2100021
+2211122
+2222222
+
+Layer 2, 3, 4 & 5:
+2211122
+2100021
+2100021
+2100021
+2100021
+2211122
+2222222
+
+```
+
+Now, let me generate the actual command to build this structure:
+
+```jsx
+[{
+   "layer": 1,
+   "matrix": [[2, 2, 1, 1, 1, 2, 2], [2, 1, 0, 0, 0, 2, 1], [2, 0, 0, 0, 0, 2, 2], [2, 0, 0, 0, 0, 2, 2], [2, 1, 0, 0, 0, 2, 1], [2, 2, 1, 1, 1, 2, 2], [2, 2, 2, 2, 2, 2, 2]]
+}, 
+{
+   "layer": 2,
+   "matrix": [[2,2,1,1,1,2,2], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,2,1,1,1,2,2], [2,2,2,2,2,2,2]]
+},
+{
+   "layer": 3,
+   "matrix": [[2,2,1,1,1,2,2], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,2,1,1,1,2,2], [2,2,2,2,2,2,2]]
+},
+{
+   "layer": 4,
+   "matrix": [[2,2,1,1,1,2,2], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,2,1,1,1,2,2], [2,2,2,2,2,2,2]]
+},
+{
+  "layer": 5,
+  "matrix": [[2,2,1,1,1,2,2], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,1,0,0,0,2,1], [2,2,1,1,1,2,2], [2,2,2,2,2,2,2]]
+}]
+```"
+
+
+************************************************************************************************************************************************************************
+
+
+"Sure! Below is a 7x7x5 cylindrical structure with the following material distribution:
+
+- Wood for the outer wall to form the cylindrical structure 
+- Cobblestone for the floor
+- Air for the interior space 
+
+Material Chart:
+0: Air
+1: Wood
+2: Cobblestone
+
+Here is a middle cross section of the cylinder:
+
+[1, 1, 1, 1, 1, 1, 1]
+[1, 0, 0, 0, 0, 0, 1]
+[1, 0, 0, 0, 0, 0, 1]
+[1, 0, 0, 0, 0, 0, 1]
+[1, 1, 1, 1, 1, 1, 1]
+
+Let's perform the build structure operation for each layer:
+
+Layer 0 (Ground cobblestone layer):
+```typescript
+{
+  "layers": {
+    "layer": 0,
+    "matrix": [
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2]
+    ]
+  }
+}
+```
+
+For Layers 1 - 4, build cylindrical wall of wood, with interior air:
+```typescript
+{
+  "layers": {
+    "layer": 1,
+    "matrix": [
+      [1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1]
+    ]
+  }
+}
+```
+Duplicate this layer for layers 2, 3, and 4.
+
+Please make sure to adjust the "layer" number accordingly for each layer."
