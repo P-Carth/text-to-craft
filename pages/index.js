@@ -5,9 +5,9 @@ import BuilderGame, {
   clearAllLayers,
   // replaceLayers,
 } from "@/components/builder/BuilderGame";
+import FAQ from "/components/FAQ"; // or the correct path to the FAQ.js file
 import { useState } from "react";
 import { MdArrowBack } from "react-icons/md";
-import BackgroundVideo from "../components/BackgroundVideo";
 
 const games = [
   { id: 1, name: "Builder" },
@@ -17,6 +17,7 @@ const games = [
 export default function HomePage() {
   const [selectedGame, setSelectedGame] = useState(1);
   const [started, setStarted] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false); // State for controlling FAQ modal
 
   return (
     <div className="min-h-screen relative">
@@ -54,9 +55,30 @@ export default function HomePage() {
             >
               Get Started
             </button>
+
+            {/* FAQ Button */}
+            <button
+              className="btn font-minecraft text-xl p-2 rounded-md bg-gray-300 hover:bg-gray-400 text-black shadow-md border-2 border-gray-500"
+              onClick={() => setShowFAQ(true)}
+            >
+              FAQ
+            </button>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              right: "10px",
+              bottom: "10px",
+              zIndex: "10",
+            }}
+          >
+            <span>Created by Preston Kirschner</span>
           </div>
         </div>
       )}
+
+      {/* FAQ Modal */}
+      <FAQ showFAQ={showFAQ} setShowFAQ={setShowFAQ} />
 
       {started && selectedGame == 2 && (
         <div>

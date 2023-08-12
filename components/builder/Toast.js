@@ -13,7 +13,7 @@ export default function Toast({ type, content, onClose }) {
     >
       <button
         onClick={onClose}
-        className="absolute top-1 right-1 bg-white rounded-full p-1 bg-transparent"
+        className="absolute top-1 right-1 bg-white rounded-full p-1 !bg-transparent"
       >
         ×
       </button>
