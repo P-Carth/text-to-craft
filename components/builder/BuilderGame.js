@@ -3,6 +3,7 @@ import TextInputWithButton from "./messageform";
 import { getTexture } from "./blockMaterials";
 import { useEffect, useRef, useState } from "react";
 import { BsTrash3Fill } from "react-icons/bs";
+import Toast from "./Toast";
 
 let layerMatrices = []; // Stores each layer's matrix
 let layerMeshes = []; // Stores each layer's meshes
@@ -87,6 +88,11 @@ export default function BuilderGame() {
   const [messages, setMessages] = useState([]);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [isBotTyping, setIsBotTyping] = useState(false);
+  const [toast, setToast] = useState({
+    type: null,
+    content: "",
+    visible: false,
+  });
 
   const containerRef = useRef();
 
@@ -135,6 +141,13 @@ export default function BuilderGame() {
   const sendMessage = (message) => {
     if (message.trim() === "") return;
 
+    // Show user's message in the alert banner
+    setToast({
+      type: "structure",
+      content: message,
+      visible: true,
+    });
+
     const userMessage = { author: "user", content: message };
     setMessages((currentMessages) => [...currentMessages, userMessage]);
 
@@ -142,10 +155,10 @@ export default function BuilderGame() {
       if (data.function_call) {
         try {
           let functionArgs;
-          console.log("function call!!", data.function_call);
 
           if (data.function_call.name === "build_structure") {
             functionArgs = JSON.parse(data.function_call.arguments);
+            console.log("userMessage", userMessage.content);
             console.log("arguments: ", functionArgs);
             replaceLayers(functionArgs);
           }
@@ -162,8 +175,21 @@ export default function BuilderGame() {
             ...messages,
             { author: "assistant", content: JSON.stringify(functionArgs) },
           ]);
+
+          // Update the alert with a checkmark or X based on success or failure
+          setToast({
+            type: "structure",
+            content: `Building: ${userMessage.content} ✔️`,
+            visible: true,
+          });
         } catch (e) {
-          alert("Failed to build structure, trying again");
+          // Update the alert with a checkmark or X based on success or failure
+          setToast({
+            type: "structure",
+            content: `Building: ${userMessage.content} X`,
+            visible: true,
+          });
+          // alert("Failed to build structure, trying again");
           sendMessage(msg);
         }
       } else {
@@ -176,6 +202,13 @@ export default function BuilderGame() {
           ...messages,
           { author: "assistant", content: data.content },
         ]);
+
+        // Update the alert with the AI's conversational response
+        setToast({
+          type: "conversation",
+          content: data.content,
+          visible: true,
+        });
       }
     });
     setMsg("");
@@ -184,6 +217,12 @@ export default function BuilderGame() {
   const handleClear = () => {
     setMessages([]);
     clearAllLayers();
+
+    setToast({
+      type: "",
+      content: "",
+      visible: false,
+    });
   };
 
   useEffect(() => {
@@ -217,20 +256,6 @@ export default function BuilderGame() {
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
       directionalLight.position.set(0, 1, 0);
       scene.add(directionalLight);
-
-      // 1. Create a sphere geometry with inverted normals
-      const geometry = new THREE.SphereGeometry(50, 32, 32);
-      geometry.scale(-1, 1, 1); // invert the geometry on the x-axis
-
-      // 2. Load a texture
-      const texture = new THREE.TextureLoader().load("sky.jpg"); // specify the path to your image
-
-      // 3. Create a mesh with the geometry and texture
-      const material = new THREE.MeshBasicMaterial({ map: texture });
-      const sphere = new THREE.Mesh(geometry, material);
-
-      // 4. Add the mesh to the scene
-      scene.add(sphere);
 
       const textureLoader = new THREE.TextureLoader();
       textureLoader.load(
@@ -287,6 +312,14 @@ export default function BuilderGame() {
         ref={containerRef}
         style={{ height: "100vh", width: "100%" }}
       />
+
+      {toast.visible && (
+        <Toast
+          type={toast.type}
+          content={toast.content}
+          onClose={() => setToast({ ...toast, visible: false })}
+        />
+      )}
 
       <div className="fixed bottom-20 left-0 right-0 mx-auto w-[600px] flex justify-center">
         <TextInputWithButton
