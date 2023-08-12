@@ -9,7 +9,7 @@ const FAQ = ({ showFAQ, setShowFAQ }) => (
         : "hidden"
     }
   >
-    <div className="bg-white p-8 rounded-md shadow-lg max-w-[50%]">
+    <div className="bg-white p-8 rounded-md shadow-lg max-w-[50%] max-sm:max-w-[80%]">
       <h2 className="text-2xl font-bold mb-4 underline">FAQs</h2>
       <p className="mb-2">
         <b>What kind of structures can I build?</b> Buildings, Towers, Houses

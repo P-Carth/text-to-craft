@@ -21,7 +21,7 @@ const TextInputWithButton = ({ onSubmit, onChange, status }) => {
   return (
     <form
       // while selected I want it to outline blue
-      className="flex items-stretch bg-white rounded-lg shadow-md overflow-hidden min-w-[500px]
+      className="flex items-stretch bg-white rounded-lg shadow-md overflow-hidden md:min-w-[500px] max-sm:max-w-[400px]
       "
       onSubmit={handleSubmit}
     >

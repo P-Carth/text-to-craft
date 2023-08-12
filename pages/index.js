@@ -39,18 +39,15 @@ export default function HomePage() {
       />
 
       {!started && (
-        <div className="flex flex-col items-center justify-evenly min-h-screen text-center">
-          <div
-            className="landing-card flex flex-col items-center justify-center min-h-[40vh] gap-4 p-8 rounded-xl shadow-lg bg-yellow-950 border-[10px] border-gray-500 bg-opacity-50 backdrop-blur-2xl	
-          "
-          >
-            <span className="flex gap-4 text-center items-center justify-center">
-              <h1 className="text-8xl font-bold text-white font-vt ">{`${"text-2-craft".toUpperCase()}`}</h1>
-              <img src="/t2craft.png" className="w-[200px]" />
+        <div className="flex flex-col items-center justify-evenly min-h-screen text-center px-4 sm:px-0">
+          <div className="landing-card flex flex-col items-center justify-center min-h-[40vh] gap-4 p-4 sm:p-8 rounded-xl shadow-lg bg-yellow-950 border-[10px] border-gray-500 bg-opacity-50 backdrop-blur-2xl">
+            <span className="flex flex-col sm:flex-row gap-4 text-center items-center justify-center">
+              <h1 className="text-4xl sm:text-8xl font-bold text-white font-vt">{`${"text-2-craft".toUpperCase()}`}</h1>
+              <img src="/t2craft.png" className="w-32 sm:w-[200px]" />
             </span>
 
             <button
-              className="btn font-minecraft text-3xl p-4 rounded-md bg-green-500 hover:bg-green-700 text-white shadow-lg border-4 border-green-800"
+              className="btn font-minecraft text-2xl sm:text-3xl p-3 sm:p-4 rounded-md bg-green-500 hover:bg-green-700 text-white shadow-lg border-4 border-green-800"
               onClick={() => setStarted(true)}
             >
               Get Started
@@ -58,20 +55,13 @@ export default function HomePage() {
 
             {/* FAQ Button */}
             <button
-              className="btn font-minecraft text-xl p-2 rounded-md bg-gray-300 hover:bg-gray-400 text-black shadow-md border-2 border-gray-500"
+              className="btn font-minecraft text-lg sm:text-xl p-2 rounded-md bg-gray-300 hover:bg-gray-400 text-black shadow-md border-2 border-gray-500"
               onClick={() => setShowFAQ(true)}
             >
               FAQ
             </button>
           </div>
-          <div
-            style={{
-              position: "absolute",
-              right: "10px",
-              bottom: "10px",
-              zIndex: "10",
-            }}
-          >
+          <div className="absolute right-2 bottom-2 sm:right-10 sm:bottom-10 z-10">
             <span>Created by Preston Kirschner</span>
           </div>
         </div>

@@ -321,7 +321,7 @@ export default function BuilderGame() {
         />
       )}
 
-      <div className="fixed bottom-20 left-0 right-0 mx-auto w-[600px] flex justify-center">
+      <div className="fixed bottom-20 left-0 right-0 mx-auto md:w-[600px] w-full px-4 flex flex-col md:flex-row justify-center">
         <TextInputWithButton
           onSubmit={(e) => {
             sendMessage(e);
@@ -330,12 +330,12 @@ export default function BuilderGame() {
           status={isBotThinking ? "thinking" : isBotTyping ? "typing" : null}
         />
         <button
-          className="btn btn-primary ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
+          className="btn btn-primary mt-2 md:mt-0 md:ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
           onClick={() => {
             handleClear();
           }}
         >
-          <span className="flex items-center font-semibold text-xl">
+          <span className="flex items-center justify-center font-semibold text-xl">
             Clear <BsTrash3Fill className="translate-y-0.5 ml-2" />
           </span>
         </button>
