@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     );
 
     const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo-0613",
+      model: "gpt-4-0613",
       messages: openaiMessages,
       functions: functions,
       function_call: "auto",

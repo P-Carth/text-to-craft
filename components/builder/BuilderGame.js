@@ -44,6 +44,8 @@ export async function addLayer(matrix, y = layerMatrices.length) {
 }
 
 function replaceLayer(matrix, y) {
+  console.log("matrix", matrix);
+  console.log("y", y);
   if (layerMeshes[y] === undefined) {
     // If the layer does not exist, add it instead
     addLayer(matrix, y);
