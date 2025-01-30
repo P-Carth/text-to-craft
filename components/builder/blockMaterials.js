@@ -1,4 +1,4 @@
-// blockTypes.js
+// blockMaterials.js
 
 import * as THREE from "three";
 
