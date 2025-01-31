@@ -1,6 +1,7 @@
 import React from "react";
 import { FaLinkedin, FaEnvelope, FaGithub } from "react-icons/fa"; // Importing the required icons
 
+// FAQ.js
 const FAQ = ({ showFAQ, setShowFAQ }) => (
   <div
     className={
@@ -9,56 +10,96 @@ const FAQ = ({ showFAQ, setShowFAQ }) => (
         : "hidden"
     }
   >
-    <div className="bg-white p-8 rounded-md shadow-lg max-w-[50%] max-sm:max-w-[80%]">
-      <h2 className="text-2xl font-bold mb-4 underline">FAQs</h2>
-      <p className="mb-2">
-        <b>What kind of structures can I build?</b> Buildings, Towers, Houses
-      </p>
-      <p className="mb-2">
-        <b>What materials are available?</b> Wood, Cobblestone, & Glass
-      </p>
-      <p className="mb-2 break-normal">
-        <b>How do I use more materials?</b> Clone the repo and you can add any
-        additional materials to the buildMaterials.js file, check readme for
-        further instructions
-      </p>
-      {/* Add more questions and answers as needed */}
-      <hr className="border-black mb-4" /> {/* Black line */}
-      <p>
-        Check out and clone the code repository{" "}
+    <div
+      className="bg-[#735943] p-6 rounded 
+      border-4 border-t-[#a38d6d] border-l-[#a38d6d] border-b-[#4a3a23] border-r-[#4a3a23]
+      shadow-[inset_0_0_8px_rgba(0,0,0,0.3)]
+      max-w-[600px] max-sm:max-w-[90vw] text-white"
+    >
+      <h2 className="text-2xl font-bold mb-4 text-shadow-[2px_2px_0_#4a3a23]">
+        FAQs
+      </h2>
+
+      <div className="space-y-4 text-sm sm:text-base">
+        <p>
+          <span className="text-[#8db860]">
+            ◆ What kind of structures can I build?
+          </span>
+          <br />
+          Buildings, Towers, Houses
+        </p>
+        <p>
+          <span className="text-[#8db860]">
+            ◆ What materials are available?
+          </span>
+          <br />
+          Wood, Cobblestone, & Glass
+        </p>
+        <p>
+          <span className="text-[#8db860]">◆ How do I use more materials?</span>
+          <br />
+          Clone the repo and add materials to buildMaterials.js
+        </p>
+      </div>
+
+      <hr className="my-4 border-[#4a3a23]" />
+
+      <div className="space-y-2">
+        <p className="text-[#8db860]">Code Repository:</p>
         <a
           href="https://github.com/P-Carth/text-to-craft"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-500 underline hover:text-blue-600"
+          className="inline-block bg-[#5b7c3d] px-3 py-1 
+            border-2 border-t-[#8db860] border-l-[#8db860] border-b-[#3d5229] border-r-[#3d5229]
+            hover:bg-[#6e974a] transition-all"
         >
-          here
+          GitHub Link
         </a>
-      </p>
-      {/* Get in contact section */}
-      <p className="mt-4">
-        Get in contact:
-        <a
-          href="https://www.linkedin.com/in/preston-kirschner/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaLinkedin className="inline mx-2 text-[#0077b5] hover:scale-[1.1]" />
-        </a>
-        <a href="mailto:prestonkirschner1@gmail.com">
-          <FaEnvelope className="inline mx-2 text-blue-400 hover:scale-[1.1]" />
-        </a>
-        <a
-          href="https://github.com/p-carth"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FaGithub className="inline mx-2 text-black hover:scale-[1.1]" />
-        </a>
-      </p>
+      </div>
+
+      <div className="mt-4">
+        <p className="text-[#8db860] mb-2">Get in contact:</p>
+        <div className="flex justify-center space-x-4">
+          {/* Icons with Minecraft-style hover effects */}
+          <a
+            href="https://www.linkedin.com/in/preston-kirschner/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 bg-[#3d4d8f] hover:bg-[#4a5fa7] 
+              border-2 border-t-[#6b8beb] border-l-[#6b8beb] border-b-[#2a3669] border-r-[#2a3669]
+              transition-all"
+          >
+            <FaLinkedin className="text-xl text-white" />
+          </a>
+          <a
+            href="mailto:prestonkirschner1@gmail.com"
+            className="p-2 bg-[#5b7c3d] hover:bg-[#6e974a] 
+              border-2 border-t-[#8db860] border-l-[#8db860] border-b-[#3d5229] border-r-[#3d5229]
+              transition-all"
+          >
+            <FaEnvelope className="text-xl text-white" />
+          </a>
+          <a
+            href="https://github.com/p-carth"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 bg-[#7a7a7a] hover:bg-[#8d8d8d] 
+              border-2 border-t-[#a3a3a3] border-l-[#a3a3a3] border-b-[#4a4a4a] border-r-[#4a4a4a]
+              transition-all"
+          >
+            <FaGithub className="text-xl text-white" />
+          </a>
+        </div>
+      </div>
+
       <button
         onClick={() => setShowFAQ(false)}
-        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        className="mt-4 px-4 py-2 
+          bg-[#a03737] hover:bg-[#c03939] active:bg-[#8a2e2e]
+          border-4 border-t-[#d86b6b] border-l-[#d86b6b] border-b-[#6b1a1a] border-r-[#6b1a1a]
+          active:border-t-[#6b1a1a] active:border-l-[#6b1a1a]
+          text-white transition-all"
       >
         Close
       </button>

@@ -1,43 +1,36 @@
-import { replaceLayers } from "/components/builder/BuilderGame";
-
+// functionConfigs.js
 export const functionConfig = {
   build_structure: {
     name: "build_structure",
-    description: `build a structure using the given layers. the numbers in the matrices correspond with different block materials used to build 3d structures.
-      materials = {0: 'air', 1: 'wood', 2: 'cobblestone', 3: 'glass'}
-      `,
+    description: "Generates layer matrices for building structures.",
     parameters: {
-      // make it a string and parse thoguh it
       type: "object",
       properties: {
         layers: {
-          type: "object",
-          //   description:
-          //     "An object where the keys correspond with the y-indices and the values are the matrices associated with the layers",
-          properties: {
-            layer: {
-              type: "number",
-              description:
-                "The layer number, this indicates where on the y-axis the layer is located",
-            },
-            matrix: {
-              type: "array",
-              description:
-                "An object where each key is a layer number and the corresponding value is a 2D array (matrix) associated with that layer.",
-              items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              layer: { type: "number" },
+              matrix: {
                 type: "array",
                 items: {
-                  type: "number",
-                  description: "A number representing a block material",
+                  type: "array",
+                  items: { type: "number" },
                 },
-                description: "A 2D array (matrix) of numbers",
               },
             },
+            required: ["layer", "matrix"],
           },
         },
       },
       required: ["layers"],
     },
-    function: replaceLayers,
+
+    // THIS is the crucial piece you're missing
+    function: async (args) => {
+      // For now, just return the layers data as is:
+      return args;
+    },
   },
 };

@@ -1,7 +1,15 @@
 // blocks.js
 import * as THREE from "three";
 
-let topWood, bottomWood, sideWood, topStone, bottomStone, sideStone;
+let topWood,
+  bottomWood,
+  sideWood,
+  topStone,
+  bottomStone,
+  sideStone,
+  topGlass,
+  bottomGlass,
+  sideGlass;
 
 if (typeof window !== "undefined") {
   // Only run this in client-side environment
@@ -16,6 +24,10 @@ if (typeof window !== "undefined") {
   topStone = loader.load("/cobble.png");
   bottomStone = topStone;
   sideStone = topStone;
+
+  topGlass = loader.load("/glass.png");
+  bottomGlass = topGlass;
+  sideGlass = topGlass;
 }
 
 // Define materials for different blocks
@@ -35,4 +47,13 @@ export const stone = [
   new THREE.MeshPhongMaterial({ map: bottomStone }),
   new THREE.MeshPhongMaterial({ map: sideStone }),
   new THREE.MeshPhongMaterial({ map: sideStone }),
+];
+
+export const glass = [
+  new THREE.MeshPhongMaterial({ map: sideGlass }),
+  new THREE.MeshPhongMaterial({ map: sideGlass }),
+  new THREE.MeshPhongMaterial({ map: topGlass }),
+  new THREE.MeshPhongMaterial({ map: bottomGlass }),
+  new THREE.MeshPhongMaterial({ map: sideGlass }),
+  new THREE.MeshPhongMaterial({ map: sideGlass }),
 ];

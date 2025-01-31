@@ -15,6 +15,12 @@ module.exports = {
       fontFamily: {
         vt: ["VT323", "monospace"], // Add your font name here
       },
+      boxShadow: {
+        "inset-craft": "inset 0 0 8px rgba(0,0,0,0.3)",
+      },
+      textShadow: {
+        craft: "2px 2px 0 #4a3a23",
+      },
     },
   },
   plugins: [],

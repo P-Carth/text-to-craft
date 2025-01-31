@@ -1,19 +1,20 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Import OrbitControls
 import TextInputWithButton from "./messageform";
 import { getTexture } from "./blockMaterials";
 import { useEffect, useRef, useState } from "react";
 import { BsTrash3Fill } from "react-icons/bs";
 import Toast from "./Toast";
 
-let layerMatrices = []; // Stores each layer's matrix
-let layerMeshes = []; // Stores each layer's meshes
+let layerMatrices = [];
+let layerMeshes = [];
 
 let scene, camera, renderer;
+let controls; // Stores OrbitControls instance
 
 export function clearAllLayers() {
-  for (let y in layerMeshes) {
-    // Remove each mesh in this layer from the scene
-    for (let mesh of layerMeshes[y]) {
+  for (let y = 0; y < layerMeshes.length; y++) {
+    for (let mesh of layerMeshes[y] || []) {
       scene.remove(mesh);
     }
   }
@@ -23,7 +24,7 @@ export function clearAllLayers() {
 
 export async function addLayer(matrix, y = layerMatrices.length) {
   const offset = (30 - matrix.length) / 2;
-  let layerMeshesInThisLayer = []; // Stores the meshes in the current layer
+  let layerMeshesInThisLayer = [];
 
   for (let i = 0; i < matrix.length; i++) {
     for (let j = 0; j < matrix[i].length; j++) {
@@ -34,55 +35,41 @@ export async function addLayer(matrix, y = layerMatrices.length) {
         const layerMesh = new THREE.Mesh(layerGeometry, blockMaterial);
         layerMesh.position.set(i - 15 + offset, y, j - 15 + offset);
         scene.add(layerMesh);
-        layerMeshesInThisLayer.push(layerMesh); // Add this mesh to the layer's meshes
+        layerMeshesInThisLayer.push(layerMesh);
       }
     }
   }
 
-  layerMatrices[y] = matrix; // Store this layer's matrix
-  layerMeshes[y] = layerMeshesInThisLayer; // Store this layer's meshes
+  layerMatrices[y] = matrix;
+  layerMeshes[y] = layerMeshesInThisLayer;
 }
 
 function replaceLayer(matrix, y) {
   console.log("matrix", matrix);
   console.log("y", y);
-  if (layerMeshes[y] === undefined) {
-    // If the layer does not exist, add it instead
+  if (!layerMeshes[y]) {
     addLayer(matrix, y);
     return;
   }
-  // Remove each mesh in this layer from the scene
   for (let mesh of layerMeshes[y]) {
     scene.remove(mesh);
   }
 
-  // Replace the matrix and rebuild the layer
   layerMatrices[y] = matrix;
   addLayer(matrix, y);
 }
 
 export async function replaceLayers(result) {
-  // layers is an object with keys as the layer number and values as the matrix
-  // for example: { 1: [[1, 1], [1, 1]], 2: [[2, 2], [2, 2]] }
-
-  let layers = result.layers;
-
-  // Edge case where the layer does not generate as an array
-  if (!Array.isArray(layers)) {
-    layers = [layers];
+  const layers = result.layers;
+  for (const layerObj of layers) {
+    await replaceLayer(layerObj.matrix, layerObj.layer);
   }
-
-  console.log("layers => ", layers);
-  for (let y in layers) {
-    await replaceLayer(layers[y].matrix, layers[y].layer);
-  }
-  //   console.log(layers);
   console.log("built successfully");
   return "built successfully";
 }
 
 export function getLayerComposition(y) {
-  return layerMatrices[y]; // Returns the matrix for the given layer
+  return layerMatrices[y];
 }
 
 export default function BuilderGame() {
@@ -98,17 +85,10 @@ export default function BuilderGame() {
 
   const containerRef = useRef();
 
-  const center = new THREE.Vector3(0, 0, 0);
-
-  let radius = 10; // The distance from the center to the camera
-  let angle = 100; // The initial angle
-
   async function botReply(userMessage) {
     setIsBotThinking(true);
 
     const newConversation = [...messages, userMessage];
-
-    // console.log("Sending conversation to the server:", newConversation);
 
     try {
       const res = await fetch("/api/gpt", {
@@ -143,7 +123,6 @@ export default function BuilderGame() {
   const sendMessage = (message) => {
     if (message.trim() === "") return;
 
-    // Show user's message in the alert banner
     setToast({
       type: "structure",
       content: message,
@@ -154,72 +133,36 @@ export default function BuilderGame() {
     setMessages((currentMessages) => [...currentMessages, userMessage]);
 
     botReply(userMessage).then((data) => {
-      if (data.function_call) {
-        try {
-          let functionArgs;
-
-          if (data.function_call.name === "build_structure") {
-            functionArgs = JSON.parse(data.function_call.arguments);
-            console.log("userMessage", userMessage.content);
-            console.log("arguments: ", functionArgs);
-            replaceLayers(functionArgs);
-          }
-          // Save the build structure to the conversation
-          setMessages((currentMessages) => [
-            ...currentMessages,
-            {
-              author: "assistant",
-              content:
-                "The current structure is: " + JSON.stringify(functionArgs),
-            },
-          ]);
-          console.log("Full conversation after the bot's reply:", [
-            ...messages,
-            { author: "assistant", content: JSON.stringify(functionArgs) },
-          ]);
-
-          // Update the alert with a checkmark or X based on success or failure
-          setToast({
-            type: "structure",
-            content: `Building: ${userMessage.content} ✔️`,
-            visible: true,
-          });
-        } catch (e) {
-          // Update the alert with a checkmark or X based on success or failure
-          setToast({
-            type: "structure",
-            content: `Building: ${userMessage.content} X`,
-            visible: true,
-          });
-          // alert("Failed to build structure, trying again");
-          sendMessage(msg);
-        }
-      } else {
+      if (data.message) {
         setMessages((currentMessages) => [
           ...currentMessages,
-          { author: "assistant", content: data.content },
-        ]);
-        console.log("data returned!!", data);
-        console.log("Full conversation after the bot's reply:", [
-          ...messages,
-          { author: "assistant", content: data.content },
+          { author: "assistant", content: data.message },
         ]);
 
-        // Update the alert with the AI's conversational response
         setToast({
           type: "conversation",
-          content: data.content,
+          content: data.message,
+          visible: true,
+        });
+      }
+
+      if (data.functionResult) {
+        replaceLayers(data.functionResult);
+
+        setToast({
+          type: "structure",
+          content: `Building: ${userMessage.content} ✔️`,
           visible: true,
         });
       }
     });
+
     setMsg("");
   };
 
   const handleClear = () => {
     setMessages([]);
     clearAllLayers();
-
     setToast({
       type: "",
       content: "",
@@ -228,10 +171,7 @@ export default function BuilderGame() {
   };
 
   useEffect(() => {
-    if (!containerRef.current) {
-      // if the ref is not assigned yet, skip this effect
-      return;
-    }
+    if (!containerRef.current) return;
 
     const container = containerRef.current;
 
@@ -240,18 +180,17 @@ export default function BuilderGame() {
 
       camera = new THREE.PerspectiveCamera(
         75,
-        window.innerWidth / window.innerHeight,
+        container.clientWidth / container.clientHeight,
         0.1,
         1000
       );
       camera.position.set(0, 20, 50);
-      camera.lookAt(new THREE.Vector3(0, 0, 0));
 
       renderer = new THREE.WebGLRenderer();
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
-      // Add lighting to the scene
+      // Add lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
 
@@ -259,12 +198,19 @@ export default function BuilderGame() {
       directionalLight.position.set(0, 1, 0);
       scene.add(directionalLight);
 
+      // Enable user-controlled rotation
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.enableZoom = true;
+      controls.target.set(0, 0, 0); // Ensure camera centers the scene
+
+      // Load a simple ground texture
       const textureLoader = new THREE.TextureLoader();
       textureLoader.load(
         "grass.png",
         function (texture) {
           const material = new THREE.MeshLambertMaterial({ map: texture });
-
           for (let i = 0; i < 30; i++) {
             for (let j = 0; j < 30; j++) {
               const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -281,23 +227,14 @@ export default function BuilderGame() {
       );
     }
 
-    const animate = function () {
+    function animate() {
       requestAnimationFrame(animate);
 
-      // Update the angle for the next frame
-      angle += 0.001; // uncomment to spin camera
-
-      // Calculate the new camera position
-      camera.position.x = center.x + radius * Math.sin(angle);
-      camera.position.z = center.z + radius * Math.cos(angle);
-
-      // Make the camera look at the center
-      camera.lookAt(center);
+      // Ensure smooth movement with damping
+      controls.update();
 
       renderer.render(scene, camera);
-    };
-
-    // Update your addLayer function
+    }
 
     init();
     animate();
@@ -323,24 +260,15 @@ export default function BuilderGame() {
         />
       )}
 
-      <div className="fixed bottom-20 left-0 right-0 mx-auto md:w-[600px] w-full px-4 flex flex-col md:flex-row justify-center">
+      <div className="fixed bottom-10 left-0 right-0 mx-auto md:w-[600px] w-full px-4 flex flex-col md:flex-row justify-center">
         <TextInputWithButton
-          onSubmit={(e) => {
-            sendMessage(e);
-            setMsg(e);
+          onSubmit={(textValue) => {
+            sendMessage(textValue);
+            setMsg(textValue);
           }}
+          onClear={handleClear}
           status={isBotThinking ? "thinking" : isBotTyping ? "typing" : null}
         />
-        <button
-          className="btn btn-primary mt-2 md:mt-0 md:ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
-          onClick={() => {
-            handleClear();
-          }}
-        >
-          <span className="flex items-center justify-center font-semibold text-xl">
-            Clear <BsTrash3Fill className="translate-y-0.5 ml-2" />
-          </span>
-        </button>
       </div>
     </div>
   );

@@ -1,12 +1,9 @@
-// gpt.js
-import { Configuration, OpenAIApi } from "openai";
-import { functionConfig } from "/gptFunctions/functionConfigs";
+import OpenAI from "openai";
+import { functionConfig } from "/gptFunctions/functionConfigs"; // Verify path
 
-// Initialize OpenAI
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "",
 });
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -25,38 +22,71 @@ export default async function handler(req, res) {
     const openaiMessages = [
       {
         role: "system",
-        content: `You are a builder bot.`,
+        content: `
+        You are a builder bot. 
+        - You have these block types with integer IDs:
+          0 => empty (no block),
+          1 => wood,
+          2 => cobblestone,
+          3 => glass
+        - When the user asks to build something, call the build_structure function. 
+        - The build_structure function expects an array of layers, each with a y-index called 'layer' and a 2D matrix of integers. 
+        - Output integers in the matrix that correspond to the block types above.
+      `,
       },
       ...conversation.map((msg) => ({
-        role: msg.author,
+        role: msg.author === "user" ? "user" : "assistant",
         content: msg.content,
       })),
     ];
 
-    // a small house with a wood floor and roof with cobblestone walls would look like this:
-    // example_matrix = {1:[[2, 2, 2, 2, 2],[2,1,1,1,2],[2,1,1,1,2],[2,1,1,1,2],[2,2,2,2,2]],2:[[2,2,2,2,2],[2,0,0,0,2],[2,0,0,0,2],[2,0,0,0,2],[2,2,2,2,2]],3:[[2,2,2,2,2],[2,0,0,0,2],[2,0,0,0,2],[2,0,0,0,2],[2,2,2,2,2]],4:[[2,2,2,2,2],[2,0,0,0,2],[2,0,0,0,2],[2,0,0,0,2],[2,2,2,2,2]],5:[[2,2,2,2,2],[2,1,1,1,2],[2,1,1,1,2],[2,1,1,1,2],[2,2,2,2,2]]}
-
-    // return res.json(openaiMessages);
-
-    const functions = Object.values(functionConfig);
     const functionMap = Object.fromEntries(
-      Object.entries(functionConfig).map(([key, val]) => [key, val.function])
+      Object.entries(functionConfig).map(([key, config]) => [
+        key, // Use object key directly
+        config.function,
+      ])
     );
 
-    const completion = await openai.createChatCompletion({
-      model: "gpt-4-0613",
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
       messages: openaiMessages,
-      functions: functions,
-      function_call: "auto",
+      tools: Object.values(functionConfig).map((config) => ({
+        type: "function",
+        function: {
+          name: config.name,
+          description: config.description,
+          parameters: config.parameters,
+        },
+      })),
+      tool_choice: "auto",
     });
 
-    const responseMessage = completion.data.choices[0].message;
+    const responseMessage = completion.choices[0].message;
 
-    return res.json(responseMessage);
+    if (responseMessage.tool_calls) {
+      const toolCall = responseMessage.tool_calls[0];
+      const functionName = toolCall.function.name;
+      const args = JSON.parse(toolCall.function.arguments);
+      const fn = functionMap[functionName];
+
+      if (!fn) {
+        throw new Error(`Function ${functionName} not found`);
+      }
+
+      const functionResult = await fn(args);
+      return res.json({
+        message: responseMessage.content || "Building your structure...",
+        functionResult: functionResult,
+      });
+    } else {
+      return res.json({
+        message: responseMessage.content,
+      });
+    }
   } catch (error) {
-    console.error("Error getting reply from OpenAI:", error);
+    console.error("Error:", error);
     return res.status(500).json({
-      message: "Internal Server Error. Failed to get a reply from OpenAI.",
+      message: error.message || "Internal Server Error",
     });
   }
 }
